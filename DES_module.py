@@ -92,6 +92,16 @@ class DES:
             key += seven_bits + parity_bit
         return key
     
+    #__________For option 3__________
+    @staticmethod
+    def fix_key_parity(key64):
+        fixed_key = ""
+        for i in range(0, 64, 8):
+            seven_bits = key64[i:i+7]
+            parity_bit = "1" if seven_bits.count("1") % 2 == 0 else "0"
+            fixed_key += seven_bits + parity_bit
+        return fixed_key
+
     #--------------------------------------------------------------------------------------------------------------
     def __init__(self, key= None):
         #__________DES tables__________
@@ -232,7 +242,7 @@ class DES:
     #--------------------------------------------------------------------------------------------------------------
     #__________DES key schedule__________
     def generate_round_keys(self, key):
-        key56 = ''.join(key[self.pc1_table[i] - 1] for i in range(56)) #PC!: 64-bit → 56-bit
+        key56 = ''.join(key[i - 1] for i in self.pc1_table) #PC!: 64-bit → 56-bit
 
         c = key56[:28]
         d = key56[28:]
@@ -286,9 +296,9 @@ class DES:
 
         cipher_blocks = [self.des_encrypt_block(block, round_keys) for block in blocks]
         cipher_bits = ''.join(cipher_blocks)
-        cipher_text = DES.bits_to_hex(cipher_bits)
+        cipher_hex = DES.bits_to_hex(cipher_bits)
 
-        print(f"Your Encrypted text is: {cipher_text}")
+        print(f"Your Encrypted text is: {cipher_hex}")
         print(f"Key used (binary): {key}")
 
     #__________Decryption__________
@@ -309,39 +319,13 @@ class DES:
         print(f"Decrypted text: {plain_text}")
 
     #--------------------------------------------------------------------------------------------------------------
-    #__________Main DES function__________
-    #__________User input__________
-    def user_input():
-        is_running = True
-        input_string = input("Enter your text: ")
-        print("Please select the type of key want.")
-        
-        print("1. Use automatically generated key.")
-        print("2. Use password as a key.")
-        print("3. Create your own key(64 bits).")
-        
-        while is_running:
-
-            key_select = int(input("Enter your choice(choice should be in number 1 or 2 or 3): "))
-            
-            if key_select == 1:
-                key = DES.generate_key()
-                is_running = False
-            elif key_select == 2:
-                password = input("Enter your password: ")
-                key = DES.pass_to_key(password)
-                is_running = False
-            elif key_select == 3:
-                key = input("Enter your key(64 bits): ")
-                if len(key) < 64 :
-                    print(f"Your key is only {len(key)} long. It should be 64 bits long")
-                elif len(key) > 64 :
-                    print(f"Your key is only {len(key)} long. It should be 64 bits long")
-                elif not set(key).issubset({"0", "1"}):
-                    print("Key must contain only 0 and 1.")
-                else :
-                    is_running = False
-            else:
-                print("Invalid option!")
-            
-        return input_string, key
+    #__________3DES Encryption__________
+    def encrypt_block_with_key(self, block, key):
+        round_keys = self.generate_round_keys(key)
+        return self.des_encrypt_block(block, round_keys)
+    
+    #__________3DES Decryption__________
+    def decrypt_block_with_key(self, block, key):
+        round_keys = self.generate_round_keys(key)
+        round_keys.reverse()
+        return self.des_encrypt_block(block, round_keys)

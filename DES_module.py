@@ -53,7 +53,7 @@ class DES:
             raise ValueError("Invalid PKCS#7 padding")
         return data_bytes[:-pad_len]
 
-
+    #--------------------------------------------------------------------------------------------------------------
     #___________Permutation bits__________
     @staticmethod
     def permute(bits, table):
@@ -63,7 +63,8 @@ class DES:
     @staticmethod
     def left_shift(bits, n):
         return bits[n:] + bits[:n]
-    
+
+    #--------------------------------------------------------------------------------------------------------------   
     #__________Keys generation__________
     #__________For option 1__________
     @staticmethod
@@ -301,6 +302,8 @@ class DES:
         cipher_bits = ''.join(cipher_blocks)
         cipher_hex = DES.bits_to_hex(cipher_bits)
 
+        print("_____________________________________")
+        print("DES Encryption Successful")
         print(f"Your Encrypted text is: {cipher_hex}")
         print(f"Key used (binary): {key}")
 
@@ -319,6 +322,8 @@ class DES:
             
         plain_text = DES.bits_to_string(plain_bits)
         
+        print("_________________________________")
+        print("DES Decryption Successful")
         print(f"Decrypted text: {plain_text}")
 
     #--------------------------------------------------------------------------------------------------------------

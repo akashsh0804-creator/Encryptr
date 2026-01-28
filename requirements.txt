@@ -1,3 +1,4 @@
 #Here are the libraries that are required to run this python project
 
-cryptography
+
+cryptography == 3.10.0

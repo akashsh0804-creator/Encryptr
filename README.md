@@ -52,13 +52,11 @@ Hashing and digital signature modules
 
 Language: Python
 
-Libraries: 
+Libraries: cryptography, customtkinter
 
 🚀 Future Improvements
 
 Add more encryption algorithms
-
-Improve UI/UX (CLI enhancements or GUI)
 
 Implement secure key storage
 

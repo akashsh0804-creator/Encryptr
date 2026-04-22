@@ -1,7 +1,7 @@
 import customtkinter as ctk
-from controller import aes_encrypt, aes_decrypt
+from controller import chacha_encrypt, chacha_decrypt
 
-class AESView(ctk.CTkFrame):
+class ChaCha20View(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color="transparent", corner_radius=20)
         self.pack(fill= "both", expand= True, padx=20, pady=20)
@@ -85,27 +85,6 @@ class AESView(ctk.CTkFrame):
             relheight=0.13
         )
 
-        self.mode_selector = ctk.CTkSegmentedButton(
-            self,
-            values=["128", "192", "256"],
-            corner_radius=8,
-            fg_color="#679499",
-            selected_color="#00b4d8",
-            selected_hover_color="#07beb8",
-            unselected_color="#80ced7",
-            unselected_hover_color="#3dccc7",
-            text_color="#212529",
-            font=("Arial", 13)
-        )
-        self.mode_selector.place(
-            relx=1,
-            rely=0.47,
-            anchor="e",
-            relwidth=0.33,
-            relheight=0.13
-        )
-        self.mode_selector.set("256")
-
         # ---------- OUTPUT BOX ----------
         self.outputbox = ctk.CTkTextbox(
             self,
@@ -137,10 +116,9 @@ class AESView(ctk.CTkFrame):
             self.set_output("Please enter plaintext.")
             return
         
-        result = aes_encrypt(
+        result = chacha_encrypt(
             plaintext=text,
-            password=key_or_password if key_or_password else None,
-            mode=self.get_mode()
+            password=key_or_password if key_or_password else None
         )
 
         output_text = f"Ciphertext:\n{result['ciphertext']}\n\n"
@@ -148,15 +126,12 @@ class AESView(ctk.CTkFrame):
         if result.get("key"):
             output_text += f"Key:\n{result['key']}\n"
 
-        if result.get("salt"):
-            output_text += f"Salt:\n{result['salt']}\n"
-
         self.set_output(output_text)
 
     # ---------- DECRYPTION ----------
     def decrypt_action(self):
         text = self.inputbox.get("1.0", "end").strip()
-        key_or_password = self.pass_inputbox.get()
+        user_key = self.pass_inputbox.get()
 
         if text == self.placeholder:
             text = ""
@@ -166,19 +141,17 @@ class AESView(ctk.CTkFrame):
             return
 
         try:
-            if key_or_password:
-                if key_or_password and key_or_password.endswith("ASKY"):
-                    result = aes_decrypt(
+            if user_key:
+                if user_key and user_key.endswith("CHKY"):
+                    result = chacha_decrypt(
                         ciphertext=text,
-                        mode=self.get_mode(),
                         password=None,
-                        key_b64=key_or_password[:-4]
+                        key_b64=user_key[:-4]
                     )
                 else:
-                    result = aes_decrypt(
+                    result = chacha_decrypt(
                         ciphertext=text,
-                        mode=self.get_mode(),
-                        password=key_or_password,
+                        password=user_key,
                         key_b64=None
                     )
             else:
@@ -196,10 +169,6 @@ class AESView(ctk.CTkFrame):
         self.outputbox.delete("1.0","end")
         self.outputbox.insert("end", text)
         self.outputbox.configure(state="disabled")
-
-    # ---------- MODE SELECTION ----------
-    def get_mode(self):
-        return int(self.mode_selector.get())
 
     # ---------- DECORATION ----------
     def clear_placeholder(self, event):

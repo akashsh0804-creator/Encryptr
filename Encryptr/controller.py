@@ -1,5 +1,6 @@
 from crypto.DES_module import DES
 from crypto.AES_module import AES
+from crypto.ChaCha20_module import ChaCha20
 import base64
 
 #--------------------------------------------------------------------------------------------------------------
@@ -111,9 +112,15 @@ def aes_encrypt(plaintext, mode, password= None):
 
     ciphertext = aes.encrypt(plaintext, key, salt)
 
+    if password:
+        key = None
+    else:
+        key = base64.b64encode(key).decode()
+        key = key + "ASKY"
+
     return{
         "ciphertext": ciphertext,
-        "key": None if password else base64.b64encode(key).decode(),
+        "key": key,
         "salt": base64.b64encode(salt).decode() if salt else None,
         "mode": f"AES-{mode}"
     }
@@ -131,10 +138,70 @@ def aes_decrypt(ciphertext, mode, password= None, key_b64= None):
     key_size = key_size_map[mode]
     
     if password:
-        plaintext = aes.decrypt(ciphertext, password, key_size, pass_based= True)
+        plaintext = aes.decrypt(
+            ciphertext,
+            password,
+            key_size,
+            pass_based=True
+        )
 
-    else:
+    elif key_b64:
         key = base64.b64decode(key_b64)
-        plaintext = aes.decrypt(ciphertext, key, key_size, pass_based= False)
+        plaintext = aes.decrypt(
+            ciphertext,
+            key,
+            key_size,
+            pass_based=False
+        )
+    else:
+        raise ValueError("No password or key provided")
+
+    return plaintext
+
+#--------------------------------------------------------------------------------------------------------------
+#__________ChaCha20 function__________
+#__________Encryption__________
+def chacha_encrypt(plaintext, password= None):
+    chacha = ChaCha20()
+
+    if password:
+        key, salt = ChaCha20.pass_to_key(password)
+    else:
+        key = ChaCha20.generate_key()
+        salt = None
+
+    ciphertext = chacha.encrypt(plaintext, key, salt)
+
+    if password:
+        key = None
+    else:
+        key = base64.b64encode(key).decode()
+        key = key + "CHKY"
+
+    return{
+        "ciphertext": ciphertext,
+        "key": key,
+        "salt": base64.b64encode(salt).decode() if salt else None
+    }
+
+#__________Decryption__________
+def chacha_decrypt(ciphertext, password= None, key_b64= None):
+    chacha = ChaCha20()
+    
+    if password:
+        plaintext = chacha.decrypt(
+            ciphertext,
+            password,
+            pass_based=True
+        )
+    elif key_b64:
+        key = base64.b64decode(key_b64)
+        plaintext = chacha.decrypt(
+            ciphertext, 
+            key, 
+            pass_based=False
+        )
+    else:
+        raise ValueError("No password or key provided")
 
     return plaintext

@@ -1,7 +1,9 @@
 import customtkinter as ctk
+from gui.home_view import HomeView
 from gui.des_view import DESView
 from gui.des3_view import DES3View
 from gui.aes_view import AESView
+from gui.chacha20_view import ChaCha20View
 
 class EncryptrApp(ctk.CTk):
     def __init__(self):
@@ -17,7 +19,7 @@ class EncryptrApp(ctk.CTk):
         # ---------- UI CONTROLS (ON TOP) ----------
         self.encryption_options = ctk.CTkOptionMenu(
             self,
-            values=["HOME", "DES", "3DES", "AES"],
+            values=["HOME", "DES", "3DES", "AES", "ChaCha20"],
             corner_radius=8,
             fg_color="#F5ECD2",
             button_color="#ED254E",
@@ -45,14 +47,13 @@ class EncryptrApp(ctk.CTk):
         )
 
         # ---------- LABEL ----------
-        label = ctk.CTkLabel(
+        self.label = ctk.CTkLabel(
             self,
             text="ENCRYPTR",
             font=("Arial", 100),
             text_color="#69433A"
             )
-
-        label.place(
+        self.label.place(
             relx=0.5,
             rely=0.17,
             anchor="center"
@@ -67,11 +68,15 @@ class EncryptrApp(ctk.CTk):
         self.content_clear()
 
         match choice:
+            case "HOME":
+                HomeView(self.content_frame)
             case "DES":
                 DESView(self.content_frame)
             case "3DES":
                 DES3View(self.content_frame)
             case "AES":
                 AESView(self.content_frame)
+            case "ChaCha20":
+                ChaCha20View(self.content_frame)
             case _:
                 pass

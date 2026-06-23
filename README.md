@@ -14,10 +14,6 @@ AES (various modes)
 
 DES
 
-File-Based Encryption
-
-Encrypt/decrypt entire documents or text files
-
 Configurable Keys & Modes
 
 User-specified keys, initialization vectors, and output handling

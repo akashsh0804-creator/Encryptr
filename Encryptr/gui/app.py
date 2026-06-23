@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from gui.home_view import HomeView
 from gui.des_view import DESView
 from gui.des3_view import DES3View
 from gui.aes_view import AESView
@@ -68,8 +67,6 @@ class EncryptrApp(ctk.CTk):
         self.content_clear()
 
         match choice:
-            case "HOME":
-                HomeView(self.content_frame)
             case "DES":
                 DESView(self.content_frame)
             case "3DES":
